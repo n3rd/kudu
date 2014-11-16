@@ -86,7 +86,7 @@ namespace Kudu.Web.App_Start
             });
 
             // TODO: Integrate with membership system
-            kernel.Bind<ICredentialProvider>().ToConstant(new BasicAuthCredentialProvider("admin", "kudu"));
+            kernel.Bind<ICredentialProvider>().To<BasicAuthForwarderCredentialProvider>().InRequestScope().WithConstructorArgument("context", _ => new HttpContextWrapper(HttpContext.Current));
             kernel.Bind<IApplicationService>().To<ApplicationService>().InRequestScope();
             kernel.Bind<ISettingsService>().To<SettingsService>();
 

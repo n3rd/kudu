@@ -223,6 +223,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\ApplicationExtensions.cs" />
+    <Compile Include="Infrastructure\BasicAuthForwarderCredentialProvider.cs" />
     <Compile Include="Infrastructure\IdentityHelper.cs" />
     <Compile Include="Infrastructure\KuduEnvironment.cs" />
     <Compile Include="Infrastructure\SlugGenerator.cs" />
