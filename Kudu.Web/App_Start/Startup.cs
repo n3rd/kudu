@@ -67,12 +67,13 @@ namespace Kudu.Web.App_Start
             string sitesBaseUrl = ConfigurationManager.AppSettings["urlBaseValue"];
             string serviceSitesBaseUrl = ConfigurationManager.AppSettings["serviceUrlBaseValue"];
             string customHostNames = ConfigurationManager.AppSettings["enableCustomHostNames"];
+            string serviceSiteBasicAuth = ConfigurationManager.AppSettings["enableServiceSiteBasicAuth"];
 
             serviceSitePath = Path.Combine(root, serviceSitePath);
             sitesPath = Path.Combine(root, sitesPath);
 
             var pathResolver = new DefaultPathResolver(serviceSitePath, sitesPath);
-            var settingsResolver = new DefaultSettingsResolver(sitesBaseUrl, serviceSitesBaseUrl, customHostNames);
+            var settingsResolver = new DefaultSettingsResolver(sitesBaseUrl, serviceSitesBaseUrl, customHostNames, serviceSiteBasicAuth);
 
             kernel.Bind<IPathResolver>().ToConstant(pathResolver);
             kernel.Bind<ISettingsResolver>().ToConstant(settingsResolver);

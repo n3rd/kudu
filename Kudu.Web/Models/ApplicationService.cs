@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Kudu.SiteManagement;
+using Kudu.Client.Infrastructure;
 
 namespace Kudu.Web.Models
 {
     public class ApplicationService : IApplicationService
     {
         private readonly ISiteManager _siteManager;
+        private readonly ICredentialProvider _credentialProvider;
 
-        public ApplicationService(ISiteManager siteManager)
+        public ApplicationService(ISiteManager siteManager, ICredentialProvider credentialProvider)
         {
             _siteManager = siteManager;
+            _credentialProvider = credentialProvider;
         }
 
         public Task AddApplication(string name)
@@ -22,7 +26,7 @@ namespace Kudu.Web.Models
                 throw new SiteExistsException();
             }
 
-            return _siteManager.CreateSiteAsync(name);
+            return _siteManager.CreateSiteAsync(name, credentials: _credentialProvider.GetCredentials());
         }
 
         public async Task<bool> DeleteApplication(string name)

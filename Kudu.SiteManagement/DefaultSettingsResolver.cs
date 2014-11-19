@@ -9,13 +9,14 @@ namespace Kudu.SiteManagement
         private readonly string _sitesBaseUrl;
         private readonly string _serviceSitesBaseUrl;
         private readonly bool _customHostNames;
+        private readonly bool _serviceSiteBasicAuth;
 
         public DefaultSettingsResolver()
-            : this(sitesBaseUrl: null, serviceSitesBaseUrl: null, enableCustomHostNames: null)
+            : this(sitesBaseUrl: null, serviceSitesBaseUrl: null, enableCustomHostNames: null, enableServiceSiteBasicAuth: null)
         {
         }
 
-        public DefaultSettingsResolver(string sitesBaseUrl, string serviceSitesBaseUrl, string enableCustomHostNames)
+        public DefaultSettingsResolver(string sitesBaseUrl, string serviceSitesBaseUrl, string enableCustomHostNames, string enableServiceSiteBasicAuth)
         {
             // Ensure the base url is normalised to not have a leading dot,
             // we will add this on later when joining the application name up
@@ -40,6 +41,11 @@ namespace Kudu.SiteManagement
             {
                 _customHostNames = false;
             }
+
+            if (enableServiceSiteBasicAuth == null || !Boolean.TryParse(enableServiceSiteBasicAuth, out _serviceSiteBasicAuth))
+            {
+                _serviceSiteBasicAuth = false;
+            }
         }
 
         public string SitesBaseUrl
@@ -63,6 +69,14 @@ namespace Kudu.SiteManagement
             get
             {
                 return _customHostNames;
+            }
+        }
+
+        public bool ServiceSiteBasicAuth
+        {
+            get
+            {
+                return _serviceSiteBasicAuth;
             }
         }
     }

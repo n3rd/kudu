@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using Kudu.Client.Deployment;
+using Kudu.Client.Infrastructure;
 using Kudu.Contracts.Settings;
 using Kudu.Contracts.SourceControl;
 using Kudu.Core.Infrastructure;
@@ -100,7 +102,7 @@ namespace Kudu.SiteManagement
             return urls;
         }
 
-        public async Task<Site> CreateSiteAsync(string applicationName)
+        public async Task<Site> CreateSiteAsync(string applicationName, ICredentials credentials = null)
         {
             using (var iis = GetServerManager())
             {
@@ -112,7 +114,7 @@ namespace Kudu.SiteManagement
 
                     // Create the service site for this site
                     string serviceSiteName = GetServiceSite(applicationName);
-                    var serviceSite = CreateSiteAsync(iis, applicationName, serviceSiteName, _pathResolver.ServiceSitePath, serviceSiteBindings);
+                    var serviceSite = CreateSiteAsync(iis, applicationName, serviceSiteName, _pathResolver.ServiceSitePath, serviceSiteBindings, _settingsResolver.ServiceSiteBasicAuth);
 
                     // Create the main site
                     string siteName = GetLiveSite(applicationName);
@@ -149,10 +151,10 @@ namespace Kudu.SiteManagement
                     }
 
                     // Wait for the site to start
-                    await OperationManager.AttemptAsync(() => WaitForSiteAsync(serviceUrls[0]));
+                    await OperationManager.AttemptAsync(() => WaitForSiteAsync(serviceUrls[0], credentials));
 
                     // Set initial ScmType state to LocalGit
-                    var settings = new RemoteDeploymentSettingsManager(serviceUrls.First() + "api/settings");
+                    var settings = new RemoteDeploymentSettingsManager(serviceUrls.First() + "api/settings", credentials: credentials);
                     await settings.SetValue(SettingsKeys.ScmType, ScmType.LocalGit);
 
                     var siteUrls = new List<string>();
@@ -415,7 +417,7 @@ namespace Kudu.SiteManagement
             return true;
         }
 
-        private IIS.Site CreateSiteAsync(IIS.ServerManager iis, string applicationName, string siteName, string siteRoot, List<string> siteBindings)
+        private IIS.Site CreateSiteAsync(IIS.ServerManager iis, string applicationName, string siteName, string siteRoot, List<string> siteBindings, bool protectSite = false)
         {
             var pool = EnsureAppPool(iis, applicationName);
 
@@ -433,6 +435,11 @@ namespace Kudu.SiteManagement
 
             site.ApplicationDefaults.ApplicationPoolName = pool.Name;
 
+            if(protectSite)
+            {
+                ProtectSite(iis, siteName);
+            }
+
             if (_traceFailedRequests)
             {
                 site.TraceFailedRequestsLogging.Enabled = true;
@@ -442,6 +449,17 @@ namespace Kudu.SiteManagement
             }
 
             return site;
+        }
+
+        private void ProtectSite(IIS.ServerManager iis, string siteName)
+        {
+            var config = iis.GetApplicationHostConfiguration();
+
+            var anonymousAuthSection = config.GetSection("system.webServer/security/authentication/anonymousAuthentication", siteName);
+            anonymousAuthSection.SetAttributeValue("enabled", false);
+
+            var basicAuthSection = config.GetSection("system.webServer/security/authentication/basicAuthentication", siteName);
+            basicAuthSection.SetAttributeValue("enabled", true);
         }
 
         private static void EnsureDefaultDocument(IIS.ServerManager iis)
@@ -553,11 +571,11 @@ namespace Kudu.SiteManagement
             return new IIS.ServerManager(Environment.ExpandEnvironmentVariables("%windir%\\system32\\inetsrv\\config\\applicationHost.config"));
         }
 
-        private static async Task WaitForSiteAsync(string serviceUrl)
+        private static async Task WaitForSiteAsync(string serviceUrl, ICredentials credentials)
         {
-            using (var client = new HttpClient())
+            using (var client = HttpClientHelper.CreateClient(serviceUrl, credentials))
             {
-                using (var response = await client.GetAsync(serviceUrl))
+                using (var response = await client.GetAsync(""))
                 {
                     response.EnsureSuccessStatusCode();
                 }

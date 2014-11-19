@@ -7,5 +7,7 @@
         string ServiceSitesBaseUrl { get; }
 
         bool CustomHostNames { get; }
+
+        bool ServiceSiteBasicAuth { get; }
     }
 }
