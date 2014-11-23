@@ -28,18 +28,20 @@ namespace Kudu.SiteManagement
         private readonly bool _traceFailedRequests;
         private readonly string _logPath;
         private readonly ISettingsResolver _settingsResolver;
+        private readonly ICertificateResolver _certificateResolver;
 
-        public SiteManager(IPathResolver pathResolver, ISettingsResolver settingsResolver)
-            : this(pathResolver, traceFailedRequests: false, logPath: null, settingsResolver: settingsResolver)
+        public SiteManager(IPathResolver pathResolver, ISettingsResolver settingsResolver, ICertificateResolver certificateResolver)
+            : this(pathResolver, traceFailedRequests: false, logPath: null, settingsResolver: settingsResolver, certificateResolver: certificateResolver)
         {
         }
 
-        public SiteManager(IPathResolver pathResolver, bool traceFailedRequests, string logPath, ISettingsResolver settingsResolver)
+        public SiteManager(IPathResolver pathResolver, bool traceFailedRequests, string logPath, ISettingsResolver settingsResolver, ICertificateResolver certificateResolver)
         {
             _logPath = logPath;
             _pathResolver = pathResolver;
             _traceFailedRequests = traceFailedRequests;
             _settingsResolver = settingsResolver;
+            _certificateResolver = certificateResolver;
         }
 
         public IEnumerable<string> GetSites()
@@ -114,7 +116,7 @@ namespace Kudu.SiteManagement
 
                     // Create the service site for this site
                     string serviceSiteName = GetServiceSite(applicationName);
-                    var serviceSite = CreateSiteAsync(iis, applicationName, serviceSiteName, _pathResolver.ServiceSitePath, serviceSiteBindings, _settingsResolver.ServiceSiteBasicAuth);
+                    var serviceSite = CreateSiteAsync(iis, applicationName, serviceSiteName, _pathResolver.ServiceSitePath, serviceSiteBindings, _settingsResolver.ServiceSiteBasicAuth, "kudu_service");
 
                     // Create the main site
                     string siteName = GetLiveSite(applicationName);
@@ -147,7 +149,7 @@ namespace Kudu.SiteManagement
                     var serviceUrls = new List<string>();
                     foreach (var url in serviceSite.Bindings)
                     {
-                        serviceUrls.Add(String.Format("http://{0}:{1}/", String.IsNullOrEmpty(url.Host) ? "localhost" : url.Host, url.EndPoint.Port));
+                        serviceUrls.Add(String.Format("{0}://{1}:{2}/", url.Protocol, String.IsNullOrEmpty(url.Host) ? "localhost" : url.Host, url.EndPoint.Port));
                     }
 
                     // Wait for the site to start
@@ -160,7 +162,7 @@ namespace Kudu.SiteManagement
                     var siteUrls = new List<string>();
                     foreach (var url in site.Bindings)
                     {
-                        siteUrls.Add(String.Format("http://{0}:{1}/", String.IsNullOrEmpty(url.Host) ? "localhost" : url.Host, url.EndPoint.Port));
+                        siteUrls.Add(String.Format("{0}://{1}:{2}/", url.Protocol, String.IsNullOrEmpty(url.Host) ? "localhost" : url.Host, url.EndPoint.Port));
                     }
 
                     return new Site
@@ -430,7 +432,7 @@ namespace Kudu.SiteManagement
             return true;
         }
 
-        private IIS.Site CreateSiteAsync(IIS.ServerManager iis, string applicationName, string siteName, string siteRoot, List<string> siteBindings, bool protectSite = false)
+        private IIS.Site CreateSiteAsync(IIS.ServerManager iis, string applicationName, string siteName, string siteRoot, List<string> siteBindings, bool protectSite = false, string certificateName = null)
         {
             var pool = EnsureAppPool(iis, applicationName);
 
@@ -438,7 +440,14 @@ namespace Kudu.SiteManagement
 
             if (siteBindings != null && siteBindings.Count > 0)
             {
-                site = iis.Sites.Add(siteName, "http", siteBindings.First(), siteRoot);
+                if (!string.IsNullOrEmpty(certificateName))
+                {
+                    site = iis.Sites.Add(siteName, siteBindings.First(), siteRoot, _certificateResolver.LookupX509Certificate2(certificateName).GetCertHash());
+                }
+                else
+                {
+                    site = iis.Sites.Add(siteName, "http", siteBindings.First(), siteRoot);
+                }
             }
             else
             {

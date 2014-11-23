@@ -70,8 +70,9 @@ namespace Kudu.TestHarness
             
             var pathResolver = new DefaultPathResolver(PathHelper.ServiceSitePath, PathHelper.SitesPath);
             var settingsResolver = new DefaultSettingsResolver();
+            var certificateResolver = new DefaultCertificateResolver();
 
-            var siteManager = GetSiteManager(pathResolver, settingsResolver);
+            var siteManager = GetSiteManager(pathResolver, settingsResolver, certificateResolver);
 
             Site site = siteManager.GetSite(applicationName);
             if (site != null)
@@ -114,9 +115,9 @@ namespace Kudu.TestHarness
             }
         }
 
-        private static ISiteManager GetSiteManager(DefaultPathResolver pathResolver, DefaultSettingsResolver settingsResolver)
+        private static ISiteManager GetSiteManager(DefaultPathResolver pathResolver, DefaultSettingsResolver settingsResolver, DefaultCertificateResolver certificateResolver)
         {
-            return new SiteManager(pathResolver, traceFailedRequests: true, logPath: PathHelper.TestResultsPath, settingsResolver: settingsResolver);
+            return new SiteManager(pathResolver, traceFailedRequests: true, logPath: PathHelper.TestResultsPath, settingsResolver: settingsResolver, certificateResolver: certificateResolver);
         }
 
         // Try to write index.html.  In case of failure with 502, we will include
