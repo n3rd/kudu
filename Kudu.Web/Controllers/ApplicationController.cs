@@ -90,7 +90,7 @@ namespace Kudu.Web.Controllers
 
         [HttpPost]
         [ActionName("add-custom-site-binding")]
-        public async Task<ActionResult> AddCustomSiteBinding(string slug, string siteBinding)
+        public async Task<ActionResult> AddCustomSiteBinding(string slug, string siteBinding, string siteProtocol)
         {
             IApplication application = _applicationService.GetApplication(slug);
 
@@ -99,7 +99,7 @@ namespace Kudu.Web.Controllers
                 return HttpNotFound();
             }
 
-            _applicationService.AddLiveSiteBinding(slug, siteBinding);
+            _applicationService.AddLiveSiteBinding(slug, siteProtocol + siteBinding);
 
             return await GetApplicationView("settings", "Details", slug);
         }
@@ -122,7 +122,7 @@ namespace Kudu.Web.Controllers
 
         [HttpPost]
         [ActionName("add-service-site-binding")]
-        public async Task<ActionResult> AddServiceSiteBinding(string slug, string siteBinding)
+        public async Task<ActionResult> AddServiceSiteBinding(string slug, string siteBinding, string siteProtocol)
         {
             IApplication application = _applicationService.GetApplication(slug);
 
@@ -131,7 +131,7 @@ namespace Kudu.Web.Controllers
                 return HttpNotFound();
             }
 
-            _applicationService.AddServiceSiteBinding(slug, siteBinding);
+            _applicationService.AddServiceSiteBinding(slug, siteProtocol + siteBinding);
 
             return await GetApplicationView("settings", "Details", slug);
         }

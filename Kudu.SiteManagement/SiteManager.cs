@@ -232,16 +232,29 @@ namespace Kudu.SiteManagement
             }
         }
 
+        private static string NormalizeBinding(string binding)
+        {
+            string normalizedBinding;
+
+            //Note: Seems like http and https is the two IIS allows when adding bindings to a site, nothing else.
+            if (binding.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                || binding.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+            {
+                normalizedBinding = binding;
+            }
+            else
+            {
+                normalizedBinding = "http://" + binding;
+            }
+
+            return normalizedBinding;
+        }
+
         public bool AddSiteBinding(string applicationName, string siteBinding, SiteType siteType)
         {
             IIS.Site site;
 
-            if (!siteBinding.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
-            {
-                siteBinding = "http://" + siteBinding;
-            }
-
-            var uri = new Uri(siteBinding);
+            var uri = new Uri(NormalizeBinding(siteBinding));
 
             try
             {
@@ -263,7 +276,7 @@ namespace Kudu.SiteManagement
 
                     if (site != null)
                     {
-                        site.Bindings.Add("*:" + uri.Port + ":" + uri.Host, "http");
+                        site.Bindings.Add("*:" + uri.Port + ":" + uri.Host, uri.Scheme);
                         iis.CommitChanges();
 
                         Thread.Sleep(1000);
@@ -435,7 +448,7 @@ namespace Kudu.SiteManagement
 
             site.ApplicationDefaults.ApplicationPoolName = pool.Name;
 
-            if(protectSite)
+            if (protectSite)
             {
                 ProtectSite(iis, siteName);
             }
