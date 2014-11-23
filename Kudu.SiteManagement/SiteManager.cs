@@ -15,6 +15,7 @@ using Kudu.Contracts.SourceControl;
 using Kudu.Core.Infrastructure;
 using Microsoft.Web.Administration;
 using IIS = Microsoft.Web.Administration;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Kudu.SiteManagement
 {
@@ -440,13 +441,20 @@ namespace Kudu.SiteManagement
 
             if (siteBindings != null && siteBindings.Count > 0)
             {
+                X509Certificate2 certificate = null;
+                
                 if (!string.IsNullOrEmpty(certificateName))
                 {
-                    site = iis.Sites.Add(siteName, siteBindings.First(), siteRoot, _certificateResolver.LookupX509Certificate2(certificateName).GetCertHash());
+                    certificate = _certificateResolver.LookupX509Certificate2(certificateName);
+                }
+
+                if (certificate == null)
+                {
+                    site = iis.Sites.Add(siteName, "http", siteBindings.First(), siteRoot);    
                 }
                 else
                 {
-                    site = iis.Sites.Add(siteName, "http", siteBindings.First(), siteRoot);
+                    site = iis.Sites.Add(siteName, siteBindings.First(), siteRoot, _certificateResolver.LookupX509Certificate2(certificateName).GetCertHash());
                 }
             }
             else
