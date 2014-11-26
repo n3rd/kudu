@@ -57,6 +57,7 @@
     <Compile Include="..\Common\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="BindingCollectionExtensions.cs" />
     <Compile Include="DefaultCertificateResolver.cs" />
     <Compile Include="DefaultPathResolver.cs">
       <SubType>Code</SubType>
@@ -70,6 +71,7 @@
     <Compile Include="Site.cs" />
     <Compile Include="SiteManager.cs" />
     <Compile Include="SiteType.cs" />
+    <Compile Include="SslFlags.cs" />
     <Compile Include="X509StoreSearcher.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -293,7 +293,7 @@ namespace Kudu.SiteManagement
                             }
                             else
                             {
-                                site.Bindings.Add("*:" + uri.Port + ":" + uri.Host, certificate.GetCertHash(), "My");
+                                site.Bindings.Add("*:" + uri.Port + ":" + uri.Host, certificate.GetCertHash(), "My", SslFlags.Sni);
                             }
                         }
 
@@ -471,7 +471,7 @@ namespace Kudu.SiteManagement
                 }
                 else
                 {
-                    site = iis.Sites.Add(siteName, siteBindings.First(), siteRoot, _certificateResolver.LookupX509Certificate2(certificateName).GetCertHash());
+                    site = iis.Sites.Add(siteName, siteBindings.First(), siteRoot, _certificateResolver.LookupX509Certificate2(certificateName).GetCertHash(), SslFlags.Sni);
                 }
             }
             else
