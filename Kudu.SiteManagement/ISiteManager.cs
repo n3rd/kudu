@@ -10,7 +10,7 @@ namespace Kudu.SiteManagement
         Site GetSite(string applicationName);
         Task<Site> CreateSiteAsync(string applicationName, ICredentials credentials = null);
         Task DeleteSiteAsync(string applicationName);
-        bool AddSiteBinding(string applicationName, string siteBinding, SiteType siteType);
+        bool AddSiteBinding(string applicationName, string siteBinding, string siteCertificate, SiteType siteType);
         bool RemoveSiteBinding(string applicationName, string siteBinding, SiteType siteType);
     }
 }

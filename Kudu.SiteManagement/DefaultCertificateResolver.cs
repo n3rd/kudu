@@ -16,5 +16,14 @@ namespace Kudu.SiteManagement
                 return searcher.Find(certificateName);
             }
         }
+
+        public IEnumerable<X509Certificate2> X509Certificate2s(string storeName = "My")
+        {
+            using (var searcher = new X509StoreSearcher(storeName, StoreLocation.LocalMachine))
+            {
+                return searcher.FindAll();
+            }
+        }
+
     }
 }

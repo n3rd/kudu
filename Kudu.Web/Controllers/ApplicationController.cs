@@ -16,16 +16,19 @@ namespace Kudu.Web.Controllers
         private readonly KuduEnvironment _environment;
         private readonly ICredentialProvider _credentialProvider;
         private readonly ISettingsResolver _settingsResolver;
+        private readonly ICertificateResolver _certificateResolver;
 
         public ApplicationController(IApplicationService applicationService,
                                      ICredentialProvider credentialProvider,
                                      KuduEnvironment environment,
-                                     ISettingsResolver settingsResolver)
+                                     ISettingsResolver settingsResolver,
+                                     ICertificateResolver certificateResolver)
         {
             _applicationService = applicationService;
             _credentialProvider = credentialProvider;
             _environment = environment;
             _settingsResolver = settingsResolver;
+            _certificateResolver = certificateResolver;
         }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
@@ -90,7 +93,7 @@ namespace Kudu.Web.Controllers
 
         [HttpPost]
         [ActionName("add-custom-site-binding")]
-        public async Task<ActionResult> AddCustomSiteBinding(string slug, string siteBinding, string siteProtocol)
+        public async Task<ActionResult> AddCustomSiteBinding(string slug, string siteBinding, string siteProtocol, string siteCertificate)
         {
             IApplication application = _applicationService.GetApplication(slug);
 
@@ -99,7 +102,7 @@ namespace Kudu.Web.Controllers
                 return HttpNotFound();
             }
 
-            _applicationService.AddLiveSiteBinding(slug, siteProtocol + siteBinding);
+            _applicationService.AddLiveSiteBinding(slug, siteProtocol + siteBinding, siteCertificate);
 
             return await GetApplicationView("settings", "Details", slug);
         }
@@ -122,7 +125,7 @@ namespace Kudu.Web.Controllers
 
         [HttpPost]
         [ActionName("add-service-site-binding")]
-        public async Task<ActionResult> AddServiceSiteBinding(string slug, string siteBinding, string siteProtocol)
+        public async Task<ActionResult> AddServiceSiteBinding(string slug, string siteBinding, string siteProtocol, string siteCertificate)
         {
             IApplication application = _applicationService.GetApplication(slug);
 
@@ -131,7 +134,7 @@ namespace Kudu.Web.Controllers
                 return HttpNotFound();
             }
 
-            _applicationService.AddServiceSiteBinding(slug, siteProtocol + siteBinding);
+            _applicationService.AddServiceSiteBinding(slug, siteProtocol + siteBinding, siteCertificate);
 
             return await GetApplicationView("settings", "Details", slug);
         }
@@ -165,6 +168,8 @@ namespace Kudu.Web.Controllers
             ViewBag.tab = tab;
             ViewBag.appName = appViewModel.Name;
             ViewBag.siteBinding = String.Empty;
+            ViewBag.certificates = _certificateResolver.X509Certificate2s()
+                                                       .Select(c => c.FriendlyName);
 
             ModelState.Clear();
 

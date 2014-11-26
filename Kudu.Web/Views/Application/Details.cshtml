@@ -79,8 +79,9 @@
             {
                 <label class="control-label"><strong>Add application site binding</strong></label>           
                 @Html.ValidationSummary()
-                @Html.DropDownList("siteProtocol", "http://|https://".Split('|').Select(str => new SelectListItem { Text = str, Value = str, Selected = str == "http://" }), new { style = "width: 120px;" })
+                @Html.DropDownList("siteProtocol", "http://|https://".Split('|').Select(str => new SelectListItem { Text = str, Value = str, Selected = str == "http://" }), new { style = "width: 120px;", onchange = "this.value == 'https://' ? $('#site-siteCertificate').show() : $('#site-siteCertificate').hide()" })
                 @Html.TextBox("siteBinding", "", new { placeholder = "example.org" })
+                @Html.DropDownList("siteCertificate", ((IEnumerable<string>)ViewBag.certificates).Select(str => new SelectListItem { Text = str, Value = str }), string.Empty, new { id = "site-siteCertificate", style = "display: none;" })
                 <button id="add_sitebinding" type="submit" class="btn btn-primary">Add binding</button>
             }
 
@@ -135,8 +136,9 @@
             {
                 <label class="control-label"><strong>Add service site binding</strong></label>           
                 @Html.ValidationSummary()
-                @Html.DropDownList("siteProtocol", "http://|https://".Split('|').Select(str => new SelectListItem { Text = str, Value = str, Selected = str == "http://" }), new { style = "width: 120px;" })
+                @Html.DropDownList("siteProtocol", "http://|https://".Split('|').Select(str => new SelectListItem { Text = str, Value = str, Selected = str == "http://" }), new { style = "width: 120px;", onchange = "this.value == 'https://' ? $('#serviceSite-siteCertificate').show() : $('#serviceSite-siteCertificate').hide()" })
                 @Html.TextBox("siteBinding", "", new { placeholder = "example.org" })
+                @Html.DropDownList("siteCertificate", ((IEnumerable<string>)ViewBag.certificates).Select(str => new SelectListItem { Text = str, Value = str }), string.Empty, new { id = "serviceSite-siteCertificate", style = "display: none;" })
                 <button id="add_sitebinding" type="submit" class="btn btn-primary">Add binding</button>
             }
 

@@ -32,6 +32,14 @@ namespace Kudu.SiteManagement
                         .FirstOrDefault(cert => cert.FriendlyName.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
+        public IEnumerable<X509Certificate2> FindAll()
+        {
+            if (_disposed) throw new ObjectDisposedException("X509StoreSearcher");
+
+            return Store.Certificates
+                        .OfType<X509Certificate2>();
+        }
+
         public void Dispose()
         {
             if (_disposed)

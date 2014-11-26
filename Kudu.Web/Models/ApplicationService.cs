@@ -62,7 +62,7 @@ namespace Kudu.Web.Models
             };
         }
 
-        public bool AddLiveSiteBinding(string name, string siteBinding)
+        public bool AddLiveSiteBinding(string name, string siteBinding, string siteCertificate)
         {
             var application = GetApplication(name);
             if (application == null)
@@ -70,7 +70,7 @@ namespace Kudu.Web.Models
                 return false;
             }
 
-            return _siteManager.AddSiteBinding(name, siteBinding, SiteType.Live);
+            return _siteManager.AddSiteBinding(name, siteBinding, siteCertificate, SiteType.Live);
         }
 
         public bool RemoveLiveSiteBinding(string name, string siteBinding)
@@ -84,7 +84,7 @@ namespace Kudu.Web.Models
             return _siteManager.RemoveSiteBinding(name, siteBinding, SiteType.Live);
         }
 
-        public bool AddServiceSiteBinding(string name, string siteBinding)
+        public bool AddServiceSiteBinding(string name, string siteBinding, string siteCertificate)
         {
             var application = GetApplication(name);
             if (application == null)
@@ -92,7 +92,7 @@ namespace Kudu.Web.Models
                 return false;
             }
 
-            return _siteManager.AddSiteBinding(name, siteBinding, SiteType.Service);
+            return _siteManager.AddSiteBinding(name, siteBinding, siteCertificate, SiteType.Service);
         }
 
         public bool RemoveServiceSiteBinding(string name, string siteBinding)

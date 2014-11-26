@@ -253,7 +253,7 @@ namespace Kudu.SiteManagement
             return normalizedBinding;
         }
 
-        public bool AddSiteBinding(string applicationName, string siteBinding, SiteType siteType)
+        public bool AddSiteBinding(string applicationName, string siteBinding, string siteCertificate, SiteType siteType)
         {
             IIS.Site site;
 
@@ -279,7 +279,24 @@ namespace Kudu.SiteManagement
 
                     if (site != null)
                     {
-                        site.Bindings.Add("*:" + uri.Port + ":" + uri.Host, uri.Scheme);
+                        if("http".Equals(uri.Scheme, StringComparison.OrdinalIgnoreCase)) 
+                        {
+                            site.Bindings.Add("*:" + uri.Port + ":" + uri.Host, "http");
+                        } 
+                        else 
+                        {
+                            var certificate = _certificateResolver.LookupX509Certificate2(siteCertificate);
+
+                            if (certificate == null)
+                            {
+                                site.Bindings.Add("*:" + uri.Port + ":" + uri.Host, "http");
+                            }
+                            else
+                            {
+                                site.Bindings.Add("*:" + uri.Port + ":" + uri.Host, certificate.GetCertHash(), "My");
+                            }
+                        }
+
                         iis.CommitChanges();
 
                         Thread.Sleep(1000);

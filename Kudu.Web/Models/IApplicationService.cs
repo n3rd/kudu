@@ -9,9 +9,9 @@ namespace Kudu.Web.Models
         Task<bool> DeleteApplication(string name);
         IEnumerable<string> GetApplications();
         IApplication GetApplication(string name);
-        bool AddLiveSiteBinding(string name, string siteBinding);
+        bool AddLiveSiteBinding(string name, string siteBinding, string siteCertificate);
         bool RemoveLiveSiteBinding(string name, string siteBinding);
-        bool AddServiceSiteBinding(string name, string siteBinding);
+        bool AddServiceSiteBinding(string name, string siteBinding, string siteCertificate);
         bool RemoveServiceSiteBinding(string name, string siteBinding);
     }
 }
