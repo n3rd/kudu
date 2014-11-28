@@ -53,16 +53,14 @@
                         <th>Port</th>
                         <th></th>
                     </tr>
-                    @foreach (string siteBinding in Model.SiteUrls.Skip(1))
-                    {
-                        var uri = new Uri(siteBinding);
-                        
+                    @foreach (var uri in Model.SiteUrls.Skip(1))
+                    {                       
                         <tr>
                             <td>@uri.Scheme</td>
-                            <td>@uri.Host</td>
+                            <td><a href="@uri" target="_blank">@uri.Host</a></td>
                             <td>@uri.Port</td>
                             <td class="actions">
-                                <button type="button" class="btn btn-primary" onclick=" removeBinding('@siteBinding', '#removesitebinding') ">Remove</button>
+                                <button type="button" class="btn btn-primary" onclick=" removeBinding('@uri.ToString()', '#removesitebinding') ">Remove</button>
                             </td>
                         </tr>
                     }
@@ -110,16 +108,14 @@
                         <th>Port</th>
                         <th></th>
                     </tr>
-                    @foreach (string siteBinding in Model.ServiceUrls.Skip(1))
-                    {
-                        var uri = new Uri(siteBinding);
-                        
+                    @foreach (var uri in Model.ServiceUrls.Skip(1))
+                    {                       
                         <tr>
                             <td>@uri.Scheme</td>
-                            <td>@uri.Host</td>
+                            <td><a href="@uri" target="_blank">@uri.Host</a></td>
                             <td>@uri.Port</td>
                             <td class="actions">
-                                <button type="button" class="btn btn-primary" onclick=" removeBinding('@siteBinding', '#removeservicebinding') ">Remove</button>
+                                <button type="button" class="btn btn-primary" onclick=" removeBinding('@uri.ToString()', '#removeservicebinding') ">Remove</button>
                             </td>
                         </tr>
                     }

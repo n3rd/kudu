@@ -4,6 +4,7 @@ using System.Linq;
 using Kudu.Core.Deployment;
 using Kudu.Core.SourceControl;
 using Kudu.SiteManagement;
+using System;
 
 namespace Kudu.Web.Models
 {
@@ -17,18 +18,18 @@ namespace Kudu.Web.Models
         {
             Name = application.Name;
             SiteUrl = application.SiteUrl.ToString();
-            SiteUrls = application.SiteUrls.Select(uri => uri.ToString());
+            SiteUrls = application.SiteUrls;
             ServiceUrl = application.ServiceUrl.ToString();
-            ServiceUrls = application.ServiceUrls.Select(uri => uri.ToString());
+            ServiceUrls = application.ServiceUrls;
             CustomHostNames = settingsResolver.CustomHostNames;
         }
 
         [Required]
         public string Name { get; set; }
         public string SiteUrl { get; set; }
-        public IEnumerable<string> SiteUrls { get; set; }
+        public IEnumerable<Uri> SiteUrls { get; set; }
         public string ServiceUrl { get; set; }
-        public IEnumerable<string> ServiceUrls { get; set; }
+        public IEnumerable<Uri> ServiceUrls { get; set; }
         public bool CustomHostNames { get; private set; }
         public RepositoryInfo RepositoryInfo { get; set; }
         
