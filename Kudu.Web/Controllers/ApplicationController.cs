@@ -168,8 +168,7 @@ namespace Kudu.Web.Controllers
             ViewBag.tab = tab;
             ViewBag.appName = appViewModel.Name;
             ViewBag.siteBinding = String.Empty;
-            ViewBag.certificates = _certificateResolver.X509Certificate2s()
-                                                       .Select(c => c.FriendlyName);
+            ViewBag.certificates = _certificateResolver.FindAll();
 
             ModelState.Clear();
 

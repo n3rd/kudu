@@ -8,7 +8,7 @@ using IIS = Microsoft.Web.Administration;
 
 namespace Kudu.SiteManagement
 {
-    public static class BindingCollectionExtensions
+    public static class WebAdministrationExtensions
     {
 
         public static IIS.Site Add(this IIS.SiteCollection siteCollection, string name, string bindingInformation, string physicalPath, byte[] certificateHash, SslFlags sslFlags)

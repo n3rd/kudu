@@ -15,7 +15,7 @@ using Kudu.Contracts.SourceControl;
 using Kudu.Core.Infrastructure;
 using Microsoft.Web.Administration;
 using IIS = Microsoft.Web.Administration;
-using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace Kudu.SiteManagement
 {
@@ -279,22 +279,21 @@ namespace Kudu.SiteManagement
 
                     if (site != null)
                     {
-                        if("http".Equals(uri.Scheme, StringComparison.OrdinalIgnoreCase)) 
+                        Certificate certificate = null;
+
+                        if (!string.IsNullOrEmpty(siteCertificate))
+                        {
+                            certificate = _certificateResolver.FindByTumbprint(siteCertificate);
+                        }
+
+                        if ("http".Equals(uri.Scheme, StringComparison.OrdinalIgnoreCase)
+                            || certificate == null)
                         {
                             site.Bindings.Add("*:" + uri.Port + ":" + uri.Host, "http");
-                        } 
-                        else 
+                        }
+                        else
                         {
-                            var certificate = _certificateResolver.LookupX509Certificate2(siteCertificate);
-
-                            if (certificate == null)
-                            {
-                                site.Bindings.Add("*:" + uri.Port + ":" + uri.Host, "http");
-                            }
-                            else
-                            {
-                                site.Bindings.Add("*:" + uri.Port + ":" + uri.Host, certificate.GetCertHash(), "My", SslFlags.Sni);
-                            }
+                            site.Bindings.Add("*:" + uri.Port + ":" + uri.Host, certificate.Hash, "My", SslFlags.Sni); 
                         }
 
                         iis.CommitChanges();
@@ -458,20 +457,20 @@ namespace Kudu.SiteManagement
 
             if (siteBindings != null && siteBindings.Count > 0)
             {
-                X509Certificate2 certificate = null;
-                
+                Certificate certificate = null;
+
                 if (!string.IsNullOrEmpty(certificateName))
                 {
-                    certificate = _certificateResolver.LookupX509Certificate2(certificateName);
+                    certificate = _certificateResolver.FindByFriendlyName(certificateName);
                 }
 
                 if (certificate == null)
                 {
-                    site = iis.Sites.Add(siteName, "http", siteBindings.First(), siteRoot);    
+                    site = iis.Sites.Add(siteName, "http", siteBindings.First(), siteRoot);
                 }
                 else
                 {
-                    site = iis.Sites.Add(siteName, siteBindings.First(), siteRoot, _certificateResolver.LookupX509Certificate2(certificateName).GetCertHash(), SslFlags.Sni);
+                    site = iis.Sites.Add(siteName, siteBindings.First(), siteRoot, certificate.Hash, SslFlags.Sni);
                 }
             }
             else

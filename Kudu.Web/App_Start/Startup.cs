@@ -77,7 +77,7 @@ namespace Kudu.Web.App_Start
 
             kernel.Bind<IPathResolver>().ToConstant(pathResolver);
             kernel.Bind<ISettingsResolver>().ToConstant(settingsResolver);
-            kernel.Bind<ICertificateResolver>().To<DefaultCertificateResolver>();
+            kernel.Bind<ICertificateResolver>().To<X509Certificate2Resolver>();
             kernel.Bind<ISiteManager>().To<SiteManager>().InSingletonScope();
             kernel.Bind<KuduEnvironment>().ToMethod(_ => new KuduEnvironment
             {

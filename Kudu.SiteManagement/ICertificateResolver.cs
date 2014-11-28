@@ -9,8 +9,10 @@ namespace Kudu.SiteManagement
 {
     public interface ICertificateResolver
     {
-        X509Certificate2 LookupX509Certificate2(string certificateName, string storeName = "My");
+        Certificate FindByFriendlyName(string friendlyName, string storeName = "My");
 
-        IEnumerable<X509Certificate2> X509Certificate2s(string storeName = "My");
+        Certificate FindByTumbprint(string thumbprint, string storeName = "My");
+
+        IEnumerable<Certificate> FindAll(string storeName = "My");
     }
 }

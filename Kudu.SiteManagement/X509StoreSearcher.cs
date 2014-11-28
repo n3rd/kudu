@@ -23,13 +23,23 @@ namespace Kudu.SiteManagement
             get { return _store; }
         }
 
-        public X509Certificate2 Find(string name)
+        public X509Certificate2 FindByFriendlyName(string friendlyName)
         {
             if (_disposed) throw new ObjectDisposedException("X509StoreSearcher");
 
             return Store.Certificates
                         .OfType<X509Certificate2>()
-                        .FirstOrDefault(cert => cert.FriendlyName.Equals(name, StringComparison.OrdinalIgnoreCase));
+                        .FirstOrDefault(cert => cert.FriendlyName.Equals(friendlyName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public X509Certificate2 FindByThumbprint(string thumbprint)
+        {
+            if (_disposed) throw new ObjectDisposedException("X509StoreSearcher");
+
+            return Store.Certificates
+                        .Find(X509FindType.FindByThumbprint, thumbprint, false)
+                        .OfType<X509Certificate2>()
+                        .FirstOrDefault();
         }
 
         public IEnumerable<X509Certificate2> FindAll()

@@ -70,7 +70,7 @@ namespace Kudu.TestHarness
             
             var pathResolver = new DefaultPathResolver(PathHelper.ServiceSitePath, PathHelper.SitesPath);
             var settingsResolver = new DefaultSettingsResolver();
-            var certificateResolver = new DefaultCertificateResolver();
+            var certificateResolver = new X509Certificate2Resolver();
 
             var siteManager = GetSiteManager(pathResolver, settingsResolver, certificateResolver);
 
@@ -115,7 +115,7 @@ namespace Kudu.TestHarness
             }
         }
 
-        private static ISiteManager GetSiteManager(DefaultPathResolver pathResolver, DefaultSettingsResolver settingsResolver, DefaultCertificateResolver certificateResolver)
+        private static ISiteManager GetSiteManager(DefaultPathResolver pathResolver, DefaultSettingsResolver settingsResolver, X509Certificate2Resolver certificateResolver)
         {
             return new SiteManager(pathResolver, traceFailedRequests: true, logPath: PathHelper.TestResultsPath, settingsResolver: settingsResolver, certificateResolver: certificateResolver);
         }

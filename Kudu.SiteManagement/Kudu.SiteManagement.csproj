@@ -57,8 +57,9 @@
     <Compile Include="..\Common\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="BindingCollectionExtensions.cs" />
-    <Compile Include="DefaultCertificateResolver.cs" />
+    <Compile Include="WebAdministrationExtensions.cs" />
+    <Compile Include="Certificate.cs" />
+    <Compile Include="X509Certificate2Resolver.cs" />
     <Compile Include="DefaultPathResolver.cs">
       <SubType>Code</SubType>
     </Compile>
