@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Kudu.Core.Deployment;
 using Kudu.Core.SourceControl;
 using Kudu.SiteManagement;
@@ -15,10 +16,10 @@ namespace Kudu.Web.Models
         public ApplicationViewModel(IApplication application, ISettingsResolver settingsResolver)
         {
             Name = application.Name;
-            SiteUrl = application.SiteUrl;
-            SiteUrls = application.SiteUrls;
-            ServiceUrl = application.ServiceUrl;
-            ServiceUrls = application.ServiceUrls;
+            SiteUrl = application.SiteUrl.ToString();
+            SiteUrls = application.SiteUrls.Select(uri => uri.ToString());
+            ServiceUrl = application.ServiceUrl.ToString();
+            ServiceUrls = application.ServiceUrls.Select(uri => uri.ToString());
             CustomHostNames = settingsResolver.CustomHostNames;
         }
 

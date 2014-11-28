@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Kudu.SiteManagement
@@ -7,23 +8,23 @@ namespace Kudu.SiteManagement
     {
         public Site()
         {
-            SiteUrls = new List<string>();
+            SiteUrls = new List<Uri>();
         }
-        public string ServiceUrl
+        public Uri ServiceUrl
         {
             get
             {
                 return ServiceUrls.FirstOrDefault();
             }
         }
-        public string SiteUrl
+        public Uri SiteUrl
         {
             get
             {
                 return SiteUrls.FirstOrDefault();
             }
         }
-        public IList<string> SiteUrls { get; set; }
-        public IList<string> ServiceUrls { get; set; }
+        public IList<Uri> SiteUrls { get; set; }
+        public IList<Uri> ServiceUrls { get; set; }
     }
 }

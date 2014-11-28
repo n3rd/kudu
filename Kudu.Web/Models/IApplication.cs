@@ -6,9 +6,9 @@ namespace Kudu.Web.Models
     public interface IApplication
     {
         string Name { get; set; }
-        string ServiceUrl { get; }
-        string SiteUrl { get; }
-        IList<string> SiteUrls { get; set; }
-        IList<string> ServiceUrls { get; set; }
+        Uri ServiceUrl { get; }
+        Uri SiteUrl { get; }
+        IList<Uri> SiteUrls { get; set; }
+        IList<Uri> ServiceUrls { get; set; }
     }
 }

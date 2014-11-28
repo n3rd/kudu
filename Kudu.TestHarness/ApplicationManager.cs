@@ -37,8 +37,8 @@ namespace Kudu.TestHarness
             // Always null in public Kudu, but makes the code more similar to private Kudu
             NetworkCredential credentials = null;
 
-            SiteUrl = site.SiteUrl;
-            ServiceUrl = site.ServiceUrl;
+            SiteUrl = site.SiteUrl.ToString();
+            ServiceUrl = site.ServiceUrl.ToString();
 
             DeploymentManager = new RemoteDeploymentManager(site.ServiceUrl + "api", credentials);
             SettingsManager = new RemoteDeploymentSettingsManager(site.ServiceUrl + "api/settings", credentials);

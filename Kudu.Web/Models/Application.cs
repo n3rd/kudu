@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Kudu.Web.Models
@@ -7,25 +8,25 @@ namespace Kudu.Web.Models
     {
         public Application()
         {
-            SiteUrls = new List<string>();
+            SiteUrls = new List<Uri>();
         }
 
         public string Name { get; set; }
-        public string ServiceUrl
+        public Uri ServiceUrl
         {
             get
             {
                 return ServiceUrls[0];
             }
         }
-        public string SiteUrl
+        public Uri SiteUrl
         {
             get
             {
                 return SiteUrls[0];
             }
         }
-        public IList<string> SiteUrls { get; set; }
-        public IList<string> ServiceUrls { get; set; }
+        public IList<Uri> SiteUrls { get; set; }
+        public IList<Uri> ServiceUrls { get; set; }
     }
 }

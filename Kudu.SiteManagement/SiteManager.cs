@@ -81,9 +81,9 @@ namespace Kudu.SiteManagement
             }
         }
 
-        private static List<string> GetSiteUrls(IIS.Site site)
+        private static List<Uri> GetSiteUrls(IIS.Site site)
         {
-            var urls = new List<string>();
+            var urls = new List<Uri>();
 
             if (site == null)
             {
@@ -99,7 +99,7 @@ namespace Kudu.SiteManagement
                     Port = binding.EndPoint.Port == 80 ? -1 : binding.EndPoint.Port
                 };
 
-                urls.Add(builder.ToString());
+                urls.Add(builder.Uri);
             }
 
             return urls;
@@ -147,23 +147,37 @@ namespace Kudu.SiteManagement
                     // Commit the changes to iis
                     iis.CommitChanges();
 
-                    var serviceUrls = new List<string>();
+                    var serviceUrls = new List<Uri>();
                     foreach (var url in serviceSite.Bindings)
                     {
-                        serviceUrls.Add(String.Format("{0}://{1}:{2}/", url.Protocol, String.IsNullOrEmpty(url.Host) ? "localhost" : url.Host, url.EndPoint.Port));
+                        var builder = new UriBuilder
+                        {
+                            Host = String.IsNullOrEmpty(url.Host) ? "localhost" : url.Host,
+                            Scheme = url.Protocol,
+                            Port = url.EndPoint.Port == 80 ? -1 : url.EndPoint.Port
+                        };
+
+                        serviceUrls.Add(builder.Uri);
                     }
 
                     // Wait for the site to start
-                    await OperationManager.AttemptAsync(() => WaitForSiteAsync(serviceUrls[0], credentials));
+                    await OperationManager.AttemptAsync(() => WaitForSiteAsync(serviceUrls[0].ToString(), credentials));
 
                     // Set initial ScmType state to LocalGit
                     var settings = new RemoteDeploymentSettingsManager(serviceUrls.First() + "api/settings", credentials: credentials);
                     await settings.SetValue(SettingsKeys.ScmType, ScmType.LocalGit);
 
-                    var siteUrls = new List<string>();
+                    var siteUrls = new List<Uri>();
                     foreach (var url in site.Bindings)
                     {
-                        siteUrls.Add(String.Format("{0}://{1}:{2}/", url.Protocol, String.IsNullOrEmpty(url.Host) ? "localhost" : url.Host, url.EndPoint.Port));
+                        var builder = new UriBuilder
+                        {
+                            Host = String.IsNullOrEmpty(url.Host) ? "localhost" : url.Host,
+                            Scheme = url.Protocol,
+                            Port = url.EndPoint.Port == 80 ? -1 : url.EndPoint.Port
+                        };
+
+                        siteUrls.Add(builder.Uri);
                     }
 
                     return new Site
