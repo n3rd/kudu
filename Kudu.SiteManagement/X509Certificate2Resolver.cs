@@ -14,7 +14,6 @@ namespace Kudu.SiteManagement
             using (var searcher = new X509StoreSearcher(storeName, StoreLocation.LocalMachine))
             {
                 return ToCertificate(searcher.FindByFriendlyName(friendlyName));
-
             }
         }
 
@@ -37,7 +36,7 @@ namespace Kudu.SiteManagement
 
         private static Certificate ToCertificate(X509Certificate2 certificate)
         {
-            return new Certificate
+            return certificate == null ? null : new Certificate
             {
                 Name = string.IsNullOrEmpty(certificate.FriendlyName) ? certificate.GetNameInfo(X509NameType.SimpleName, false) : certificate.FriendlyName,
                 Thumbprint = certificate.Thumbprint,
